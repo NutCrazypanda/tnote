@@ -35,3 +35,9 @@ options:
   -s string, --search string
                         Search for any match string in title and note.
 ```
+
+# Example
+
+<img width="794" alt="Screenshot 2566-03-29 at 13 20 14" src="https://user-images.githubusercontent.com/56244402/228444062-56d6a498-bf8d-4c38-bed2-7e0830d6c54f.png">
+
+

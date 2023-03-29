@@ -16,6 +16,16 @@ def create_table():
     conn.commit()
     conn.close()
 
+def reset_primary_key():
+    conn = sqlite3.connect('notes.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT count(*) FROM notes")
+    result = cursor.fetchone()[0]
+    if result == 0:
+        cursor.execute("DELETE FROM sqlite_sequence WHERE name='notes'")
+        #cursor.execute("INSERT INTO table_name (id, column1, column2) VALUES (1, 'value1', 'value2')")
+        conn.commit()
+    conn.close()
 
 def add_note(title, note):
     conn = sqlite3.connect('notes.db')
@@ -77,6 +87,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     create_table()
+    try:
+        reset_primary_key()
+    except:
+        None
 
     if args.add:
         add_note(args.add[0], args.add[1])

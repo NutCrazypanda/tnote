@@ -1,3 +1,4 @@
+#!/usr/local/bin/python3
 import argparse
 import sqlite3
 from rich.console import Console

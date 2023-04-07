@@ -2,12 +2,13 @@
 import argparse
 import sqlite3
 from rich.console import Console
+import os
 
 console = Console()
-
+dbfile  = '/xxxx/notes.db' #your db file
 
 def create_table():
-    conn = sqlite3.connect('notes.db')
+    conn = sqlite3.connect(dbfile)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS notes
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,7 +18,7 @@ def create_table():
     conn.close()
 
 def reset_primary_key():
-    conn = sqlite3.connect('notes.db')
+    conn = sqlite3.connect(dbfile)
     cursor = conn.cursor()
     cursor.execute("SELECT count(*) FROM notes")
     result = cursor.fetchone()[0]
@@ -28,7 +29,7 @@ def reset_primary_key():
     conn.close()
 
 def add_note(title, note):
-    conn = sqlite3.connect('notes.db')
+    conn = sqlite3.connect(dbfile)
     c = conn.cursor()
     c.execute("INSERT INTO notes (title, note) VALUES (?, ?)", (title, note))
     conn.commit()
@@ -36,7 +37,7 @@ def add_note(title, note):
 
 
 def delete_note(id):
-    conn = sqlite3.connect('notes.db')
+    conn = sqlite3.connect(dbfile)
     c = conn.cursor()
     c.execute("DELETE FROM notes WHERE id=?", (id,))
     conn.commit()
@@ -44,7 +45,7 @@ def delete_note(id):
 
 
 def list_notes(search=None):
-    conn = sqlite3.connect('notes.db')
+    conn = sqlite3.connect(dbfile)
     c = conn.cursor()
 
     if search:
@@ -71,8 +72,25 @@ def list_notes(search=None):
         for row in rows:
             console.print(f"{row[0]}. [bold blue]{row[1]}[/bold blue] - {row[2]}", style="bold green")
 
+# dump all notes and clear database and reinsert all notes
+def reindex():
+    conn = sqlite3.connect(dbfile)
+    c = conn.cursor()
+    c.execute("SELECT * FROM notes")
+    rows = c.fetchall()
+    conn.commit()
+
+    # delete dbfile and create new one
+    conn.close()
+    os.remove(dbfile)
+    create_table()
+
+    for row in rows:
+        add_note(row[1], row[2])
+
 
 if __name__ == '__main__':
+
 
     parser = argparse.ArgumentParser(description='Note taking app.')
 
@@ -84,6 +102,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-s', '--search', metavar='string', help='Search for any match string in title and note.')
 
+    parser.add_argument('-re', '--reindex', action='store_true', help='Reindex all notes.')
     args = parser.parse_args()
 
     create_table()
@@ -105,3 +124,7 @@ if __name__ == '__main__':
 
     elif args.search:
         list_notes(args.search)
+    
+    elif args.reindex:
+        reindex()
+        console.print("Reindex completed.", style="bold green")

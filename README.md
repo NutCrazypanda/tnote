@@ -34,6 +34,7 @@ options:
   -l, --list            List all notes.
   -s string, --search string
                         Search for any match string in title and note.
+  -re, --reindex        Reindex all notes.
 ```
 
 # Example
